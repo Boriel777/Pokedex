@@ -1,0 +1,29 @@
+*:root {
+
+    /* colors */
+    --white:#fff;
+    --bg-color1: rgb(10, 14, 39);
+    --bg-color2: rgb(2, 6, 23);
+    --c-color1: 18, 113, 255;
+    --c-color2: 221, 74, 255;
+    --c-color3: 100, 220, 255;
+    --c-color4: 200, 50, 50;
+    --c-color5: 180, 180, 50;
+    --color-interactive: 148, 108, 255;
+    --type-color: #fff;
+
+    /* sizes */
+    --circle-size: 80%;
+
+    /* effects */
+    --blending: hard-light;
+}
+
+ul {
+    list-style: none;
+}
+
+button {
+    background: none;
+    border: none;
+}
