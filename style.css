@@ -7,6 +7,10 @@ body {
     overflow: hidden;
 }
 
+.header-logo {
+    width: 250px;
+}
+
 @keyframes moveInCircle {
     0% {
         transform: rotate(0deg);
@@ -176,8 +180,11 @@ h2.pokemon-card-name {
     padding: 4px 8px;
     border-radius: 999px;
     font-size: 0.75rem;
-    font-weight: 600;
+    font-weight: 300;
+    letter-spacing: 0.5px;
     color: #fff;
+    text-shadow: 0 0 4px rgb(0 0 0 / 80%);
+    box-shadow: 0 0 5px 0px rgb(0 0 0 /15%);
 }
 
 /* Pokemon Grid Styles END */

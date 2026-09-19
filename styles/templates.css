@@ -1,36 +1,14 @@
 /* PokeCard Styles */
 
+/* templates.css */
 .pokemon-card {
     width: max-content;
     border: 5px solid #ffffff;
     border-radius: 16px;
     background-color: #000000;
-    background-image:
-        radial-gradient(circle at 30% 30%, #4caf50 0%, transparent 40%),
-        radial-gradient(circle at 70% 60%, #66bb6a 0%, transparent 40%),
-        radial-gradient(circle at 50% 80%, #2e7d32 0%, transparent 40%);
-    background-repeat: no-repeat;
-    animation: blobDrift 8s ease-in-out infinite;
+    background: var(--card-bg, #000000);
     padding: 12px;
     cursor: pointer;
-}
-
-@keyframes blobDrift {
-    0% {
-        background-position: 0% 0%, 100% 0%, 50% 100%;
-    }
-
-    33% {
-        background-position: 20% 50%, 60% 30%, 30% 80%;
-    }
-
-    66% {
-        background-position: 60% 20%, 20% 70%, 70% 40%;
-    }
-
-    100% {
-        background-position: 0% 0%, 100% 0%, 50% 100%;
-    }
 }
 
 .pokemon-card-button {

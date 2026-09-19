@@ -1,6 +1,6 @@
-function cardMarkupTemplate({ id, name, image, badges }) {
+function cardMarkupTemplate({ id, name, image, badges, cardBackground }) {
     return `
-        <li class="pokemon-card" data-id="card-${id}">
+        <li class="pokemon-card" data-id="card-${id}" style="--card-bg: ${cardBackground};">
             <button class="pokemon-card-button" type="button"
                 aria-label="Open information about ${name}" data-id="card">
                 <div class="pokemon-card-content">
