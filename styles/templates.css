@@ -1,18 +1,53 @@
 /* PokeCard Styles */
 
-/* templates.css */
 .pokemon-card {
     width: max-content;
     border: 5px solid #ffffff;
     border-radius: 16px;
-    background-color: #000000;
     background: var(--card-bg, #000000);
-    padding: 12px;
     cursor: pointer;
+    transition: all 35ms ease-in-out;
+}
+
+.pokemon-card:hover {
+    transform: scale(1.02) translateY(-5px);
 }
 
 .pokemon-card-button {
+    padding: 12px;
     color: #ffffff;
+}
+
+.poke-img-wrapper {
+    height: 130px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+}
+
+h2.pokemon-card-name {
+    width: 160px;
+}
+
+.pokemon-card-image {
+    transform: scale(1.2) translateY(-25px);
+}
+
+.pokemon-card-types {
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.pokemon-type {
+    display: inline-block;
+    padding: 4px 15px;
+    border-radius: 3px;
+    text-transform: capitalize;
+    font-size: 0.75rem;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    color: #fff;
+    box-shadow: 0 0 5px 0px rgb(0 0 0 /15%);
 }
 
 /* PokeCard Styles END */

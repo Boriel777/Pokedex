@@ -4,12 +4,9 @@ body {
     position: relative;
     background-color: #000;
     color: #fff;
-    overflow: hidden;
 }
 
-.header-logo {
-    width: 250px;
-}
+/* Site Background Styles */
 
 @keyframes moveInCircle {
     0% {
@@ -57,17 +54,14 @@ body {
 }
 
 .gradient-bg {
-    width: 100vw;
-    height: 100vh;
-    position: absolute;
+    position: fixed;
+    inset: 0;
     overflow: hidden;
     background: linear-gradient(40deg, var(--bg-color1), var(--bg-color2));
-    top: 0;
-    left: 0;
     z-index: -1;
 }
 
-svg {
+.filter-defs {
     display: none;
 }
 
@@ -151,40 +145,60 @@ svg {
     top: -50%;
     left: -50%;
     transform-origin: calc(50% - 800px) calc(50% + 200px);
-    animation: moveInCircle 20s ease infinite;
     opacity: 0.7;
+}
+
+
+/* Site Background Styles END */
+
+main {
+    margin-top: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.header-logo {
+    width: 250px;
+}
+
+.load-more-btn {
+    background: var(--btn-color);
+    color: #fff;
+    font-size: 16px;
+    margin: 25px 0;
+}
+
+.load-more-btn:hover {
+    background: var(--btn-hover-color);
 }
 
 /* Site Styles END */
 
 /* Pokemon Grid Styles */
 
+header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1200px;
+    padding: 15px 20px;
+    margin: 0 auto;
+}
+
+#pokeDexMainWrapper{
+    max-width: 1200px;
+    padding: 15px 20px;
+    margin: 0 auto;
+}
+
 #pokeCardsWrapper {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-evenly;
-    gap: 15px;
-}
-
-h2.pokemon-card-name {
-    width: 160px;
-}
-
-.pokemon-card-types {
-    display: flex;
-    justify-content: space-evenly;
-}
-
-.pokemon-type {
-    display: inline-block;
-    padding: 4px 8px;
-    border-radius: 999px;
-    font-size: 0.75rem;
-    font-weight: 300;
-    letter-spacing: 0.5px;
-    color: #fff;
-    text-shadow: 0 0 4px rgb(0 0 0 / 80%);
-    box-shadow: 0 0 5px 0px rgb(0 0 0 /15%);
+    justify-content: center;
+    gap: 25px;
 }
 
 /* Pokemon Grid Styles END */

@@ -4,26 +4,52 @@
     --white:#fff;
     --bg-color1: rgb(10, 14, 39);
     --bg-color2: rgb(2, 6, 23);
-    --c-color1: 18, 113, 255;
-    --c-color2: 221, 74, 255;
-    --c-color3: 100, 220, 255;
-    --c-color4: 200, 50, 50;
-    --c-color5: 180, 180, 50;
-    --color-interactive: 148, 108, 255;
+    --c-color1: 185, 127, 201;
+    --c-color2: 253, 125, 36;
+    --c-color3: 69, 146, 196;
+    --c-color4: 155, 204, 80;
+    --c-color5: 238, 213, 53;
+    --color-interactive: 164, 172, 175;
     --type-color: #fff;
+    --btn-color: #30a7d7;
+    --btn-hover-color: #1b82b1;
 
     /* sizes */
     --circle-size: 80%;
 
     /* effects */
     --blending: hard-light;
+
+    /* typography */
+    --primary-font: 'Flexo', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    font-size: 16px;
+}
+
+body {
+    font-family: var(--primary-font)
+}
 ul {
     list-style: none;
 }
 
 button {
+    font-family: var(--primary-font);
     background: none;
     border: none;
+    cursor: pointer;
+}
+
+.pill-btn {
+    border-radius: 5px;
+    padding: 10px 20px 8px;
 }

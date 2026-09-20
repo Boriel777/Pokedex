@@ -6,7 +6,7 @@ function cardMarkupTemplate({ id, name, image, badges, cardBackground }) {
                 <div class="pokemon-card-content">
                     <span class="pokemon-card-id">#${id}</span>
                     <h2 class="pokemon-card-name">${name.toUpperCase()}</h2>
-                    <img class="pokemon-card-image" src="${image}" alt="${name}" data-id="card-image">
+                    <div class="poke-img-wrapper"><img class="pokemon-card-image" src="${image}" alt="${name}" data-id="card-image"></div>
                     <div class="pokemon-card-types">${badges}</div>
                 </div>
             </button>

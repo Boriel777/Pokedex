@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <link rel="stylesheet" href="styles/fonts.css">
     <link rel="stylesheet" href="styles/root.css">
     <link rel="stylesheet" href="styles/templates.css">
     <link rel="stylesheet" href="style.css">
@@ -15,7 +16,7 @@
     <script src="/scripts/interactive_bg.js"></script>
     <script defer src="/scripts/templates.js"></script>
     <script defer src="script.js"></script>
-    <title>PokeDex App</title>
+    <title>PokéDex App</title>
 </head>
 
 <body onload="init()">
@@ -24,20 +25,26 @@
         <input type="search" aria-label="Search" id="">
     </header>
     <main>
-        <h1>PokeDex</h1>
+        <h1>PokéDex</h1>
+        <p>Enjoy this fan-based Pokédex project.</p>
         <div id="pokeDexMainWrapper">
             <ul id="pokeCardsWrapper"></ul>
         </div>
+        <aside id="pokeTypeFilter"></aside>
+        <button class="pill-btn load-more-btn">Load more Pokèmon</button>
     </main>
     <footer>
         ©2026 - Dalibor Durbas
+
+        <div>Icons made from <a href="https://www.onlinewebfonts.com/icon">svg icons</a> is licensed by CC BY 4.0</div>
     </footer>
     <div class="gradient-bg">
-        <svg xmlns="http://www.w3.org/2000/svg">
+        <svg class="filter-defs" xmlns="http://www.w3.org/2000/svg">
             <defs>
                 <filter id="goo">
                     <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
-                    <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8" result="goo" />
+                    <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8"
+                        result="goo" />
                     <feBlend in="SourceGraphic" in2="goo" />
                 </filter>
             </defs>

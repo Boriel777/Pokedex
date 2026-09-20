@@ -1,3 +1,7 @@
+const darkTextTypes = new Set([
+    'normal', 'grass', 'electric', 'ice', 'ground', 'flying', 'steel', 'fairy'
+]);
+
 async function init() {
     injectTypeColorStyles();
     const basicList = await fetchPokemonBatch();
@@ -13,7 +17,8 @@ function buildTypeBadges(types) {
 
 function buildCardMarkup(pokemon) {
     const id = String(pokemon.id).padStart(3, '0');
-    const image = pokemon.sprites.front_default || 'https://placehold.co/120x80';
+    const animatedSprite = pokemon.sprites.versions['generation-v']['black-white'].animated.front_default;
+    const image = animatedSprite || pokemon.sprites.front_default || 'https://placehold.co/120x80';
     const types = pokemon.types.map(t => t.type.name);
     const badges = buildTypeBadges(types);
     const cardBackground = buildCardBackground(types);
@@ -25,9 +30,13 @@ function renderPokemonCards(pokemonList) {
     wrapper.insertAdjacentHTML('beforeend', pokemonList.map(buildCardMarkup).join(''));
 }
 
+function getTypeTextColor(type) {
+    return darkTextTypes.has(type) ? '#000' : '#fff'
+}
+
 function injectTypeColorStyles() {
-    const rules = Object.entries(typeColors)
-        .map(([type, { shades }]) => `.pokemon-type-${type} { background-color: rgb(${shades[0]}); }`)
+    const rules = Object.keys(typeColors)
+        .map(type => `.pokemon-type-${type} { background: ${typeGradient(type)}; color: ${getTypeTextColor(type)}; }`)
         .join('\n');
     const styleTag = document.createElement('style');
     styleTag.textContent = rules;
@@ -35,11 +44,17 @@ function injectTypeColorStyles() {
 }
 
 function buildCardBackground(types) {
-    const rgba = t => `rgba(${typeColors[t].shades[0]}, ${CARD_ALPHA})`;
-    if (types.length === 1) {
-        return `linear-gradient(${rgba(types[0])}, ${rgba(types[0])})`;
+    const colorGroups = types.map(t => {
+        const c = typeColors[t].main;
+        return c.length === 1 ? [c[0], c[0]] : c;
+    });
+    const colors = colorGroups.flat().map(c => `rgba(${c}, ${CARD_ALPHA})`);
+    if (colors.length === 1) {
+        return `linear-gradient(${colors[0]}, ${colors[0]})`;
     }
-    const [a, b] = types;
-    return `linear-gradient(135deg, ${rgba(a)}, ${rgba(b)})`;
+    return `linear-gradient(135deg, ${buildGradientStops(colors)})`;
 }
 
+function buildGradientStops(colors) {
+    return colors.join(', ');
+}
