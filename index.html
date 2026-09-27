@@ -22,7 +22,7 @@
 <body onload="init()">
     <header>
         <img class="header-logo" src="/assets/img/Pokédex_logo.png" alt="PokeDex Logo">
-        <input type="search" aria-label="Search" id="">
+        <input type="search" aria-label="Search" id="poke-search-bar">
     </header>
     <main>
         <h1>PokéDex</h1>
@@ -31,13 +31,14 @@
             <ul id="pokeCardsWrapper"></ul>
         </div>
         <aside id="pokeTypeFilter"></aside>
-        <button class="pill-btn load-more-btn">Load more Pokèmon</button>
+        <button id="load-more-btn" class="pill-btn" onclick="loadMorePokemon()">Load more Pokémon</button>
     </main>
     <footer>
         ©2026 - Dalibor Durbas
 
         <div>Icons made from <a href="https://www.onlinewebfonts.com/icon">svg icons</a> is licensed by CC BY 4.0</div>
     </footer>
+    <dialog class="poke-preview-wrapper" id="poke-card-modal" onclick="closePokeModal()" onkeydown="handleModalKeydown(event)"></dialog>
     <div class="gradient-bg">
         <svg class="filter-defs" xmlns="http://www.w3.org/2000/svg">
             <defs>

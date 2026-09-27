@@ -1,6 +1,13 @@
 *:root {
 
     /* colors */
+    --color-primary-light: #3466af;
+    --color-primary: #21386e;
+    --color-primary-dark: #1d2c5e;
+    --color-secondary: #ffcb05;
+    --color-secondary-dark: #c7a008;
+    --color-gray: #e4e4e4;
+    
     --white:#fff;
     --bg-color1: rgb(10, 14, 39);
     --bg-color2: rgb(2, 6, 23);
@@ -53,3 +60,5 @@ button {
     border-radius: 5px;
     padding: 10px 20px 8px;
 }
+
+.hidden {display: none;}

@@ -2,12 +2,13 @@ const POKEAPI_BASE = 'https://pokeapi.co/api/v2';
 let offset = 0;
 const BATCH_SIZE = 20;
 
+// api.js
 async function fetchPokemonBatch() {
     const res = await fetch(`${POKEAPI_BASE}/pokemon?limit=${BATCH_SIZE}&offset=${offset}`);
     if (!res.ok) throw new Error(`PokeAPI Fehler: ${res.status}`);
     const data = await res.json();
     offset += BATCH_SIZE;
-    return data.results;
+    return { results: data.results, hasMore: data.next !== null };
 }
 
 async function fetchPokemonDetails(basicList) {

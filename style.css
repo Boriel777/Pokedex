@@ -6,6 +6,10 @@ body {
     color: #fff;
 }
 
+body:has(#poke-card-modal[open]) {
+    overflow: hidden;
+}
+
 /* Site Background Styles */
 
 @keyframes moveInCircle {
@@ -151,6 +155,19 @@ body {
 
 /* Site Background Styles END */
 
+header #poke-search-bar {
+    padding: 6px 8px;
+    border-radius: 5px;
+    border: solid 3px var(--color-primary-light);
+    transition: all 150ms ease-in-out;
+}
+
+header #poke-search-bar:focus-visible {
+    outline: -webkit-focus-ring-color solid var(--color-secondary) 1px;
+    outline: solid var(--color-secondary) 1px;
+    border: solid 3px var(--color-secondary-dark);
+}
+
 main {
     margin-top: 50px;
     display: flex;
@@ -163,15 +180,22 @@ main {
     width: 250px;
 }
 
-.load-more-btn {
+#load-more-btn {
     background: var(--btn-color);
     color: #fff;
     font-size: 16px;
     margin: 25px 0;
+    transition: all 150ms ease-in-out;
 }
 
-.load-more-btn:hover {
+#load-more-btn:hover {
     background: var(--btn-hover-color);
+}
+
+#load-more-btn:disabled {
+    background: var(--color-gray);
+    cursor: not-allowed;
+    color: #2e2e2e;
 }
 
 /* Site Styles END */
@@ -188,7 +212,7 @@ header {
     margin: 0 auto;
 }
 
-#pokeDexMainWrapper{
+#pokeDexMainWrapper {
     max-width: 1200px;
     padding: 15px 20px;
     margin: 0 auto;
