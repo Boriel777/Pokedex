@@ -84,17 +84,37 @@ async function openPokeModal(id) {
     document.getElementById('poke-card-modal').showModal();
 }
 
+function buildStatsMarkup(stats) {
+    return stats.map(statRowTemplate).join('');
+}
+
 async function renderModalContent(id) {
     const res = await fetch(`${POKEAPI_BASE}/pokemon/${id}`);
     if (!res.ok) return;
     const pokemon = await res.json();
+    currentPokemonId = pokemon.id;
     const paddedId = String(pokemon.id).padStart(4, '0');
     const name = pokemon.name;
     const officialArt = pokemon.sprites.other['official-artwork'].front_default;
     const homeSprite = pokemon.sprites.other.home.front_default;
     const image = officialArt || homeSprite || pokemon.sprites.front_default || 'https://placehold.co/300x300';
-    document.getElementById('poke-card-modal').innerHTML = modalContentTemplate({ id: paddedId, name: name, image: image });
+    const heightMeters = (pokemon.height / 10).toFixed(1);
+    const weightKg = (pokemon.weight / 10).toFixed(1);
+    const stats = buildStatsData(pokemon.stats);
+    const statsMarkup = buildStatsMarkup(stats);
+    document.getElementById('poke-card-modal').innerHTML = modalContentTemplate({ id: paddedId, name: name, image: image, heightMeters, weightKg, statsMarkup });
     await updateNavButtons(pokemon.id);
+}
+
+function buildStatsData(statsArray) {
+    const statMap = {
+        hp: 'HP', attack: 'ATK', defense: 'DEF', 'special-attack': 'SP.ATK', 'special-defense': 'SP.DEF', speed: 'SPD'
+    };
+    return statsArray.map(s => ({
+        label: statMap[s.stat.name] || s.stat.name.toUpperCase(),
+        value: s.base_stat,
+        percent: Math.round((s.base_stat / 255) * 100)
+    }));
 }
 
 async function updateNavButtons(id) {
@@ -104,8 +124,7 @@ async function updateNavButtons(id) {
 }
 
 async function navigatePokemon(direction) {
-    const newId = currentPokemonId + direction;
-    await renderModalContent(newId);
+    await renderModalContent(currentPokemonId + direction);
 }
 
 function handleModalKeydown(event) {
@@ -115,4 +134,11 @@ function handleModalKeydown(event) {
 
 function closePokeModal() {
     document.getElementById('poke-card-modal').close();
+}
+
+function openInfoOverlay(type) {
+    const overlay = document.getElementById('poke-info-overlay');
+    overlay.className = `poke-info-overlay poke-info-overlay--${type}`;
+    overlay.innerHTML = type === 'height' ? heightOverlayTemplate(/*...*/) : abilityOverlayTemplate(/*...*/);
+    overlay.classList.remove('hidden');
 }
