@@ -19,83 +19,99 @@ function typeBadgesTemplate(t) {
     `;
 }
 
-function modalContentTemplate({ id, name, image, heightMeters, weightKg, statsMarkup }) {
+function modalContentTemplate(data) {
     return `
         <div class="poke-preview-content" data-id="modal-content" onclick="event.stopPropagation()">
             <button type="button" class="modal-close-btn" data-id="modal-close" onclick="closePokeModal()">×</button>
-            <div class="poke-header" data-id="modal-header">
-                <h2 data-id="modal-name">${name.toUpperCase()}</h2>
-                <span class="poke-dex-number" data-id="modal-dex-number">#${id}</span>
-            </div>
-
-            <div class="pokemon-info-wrapper" data-id="modal-info-wrapper">
-                <div class="pokemon-info-container" data-id="modal-info-container">
-
-                    <div class="poke-image-column" data-id="modal-image-column">
-                        <img class="modal-image" data-id="modal-image" src="${image}" alt="${name}">
-                        <span class="poke-label type-label">Type</span>
-                        <div class="poke-type-badges" data-id="modal-types">
-                            <span class="pokemon-type pokemon-type-grass">Grass</span>
-                            <span class="pokemon-type pokemon-type-poison">Poison</span>
-                        </div>
-                        <div class="poke-weaknesses" data-id="modal-weaknesses">
-                            <span class="poke-label weakness-label">Weaknesses</span>
-                            <div class="weakness-icons" data-id="modal-weakness-icons">
-                                <span class="pokemon-type pokemon-type-fire">Fire</span>
-                                <span class="pokemon-type pokemon-type-ice">Ice</span>
-                                <span class="pokemon-type pokemon-type-flying">Flying</span>
-                                <span class="pokemon-type pokemon-type-psychic">Psychic</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="poke-abilities-column" data-id="modal-abilities-column">
-                        <p class="poke-flavor-text" data-id="modal-flavor-text">
-                            Platzhalter Flavor Text.
-                        </p>
-
-                        <div class="poke-stats" data-id="modal-stats">${statsMarkup}</div>
-
-                        <div class="poke-meta-grid" data-id="modal-meta-grid">
-                            <div class="meta-item" data-id="modal-height">
-                                <span class="poke-label meta-label">Height</span>
-                                <span class="meta-value">${heightMeters} m <button class="info-btn" data-id="modal-height-info" onclick="openInfoOverlay('height')">?</button></span>
-                            </div>
-                            <div class="meta-item" data-id="modal-weight">
-                                <span class="poke-label meta-label">Weight</span>
-                                <span class="meta-value">${weightKg} kg</span>
-                            </div>
-                            <div class="meta-item" data-id="modal-gender">
-                                <span class="poke-label meta-label">Gender</span>
-                                <span class="meta-value">Platzhalter</span>
-                            </div>
-                            <div class="meta-item" data-id="modal-category">
-                                <span class="poke-label meta-label">Category</span>
-                                <span class="meta-value">Platzhalter</span>
-                            </div>
-                            <div class="meta-item meta-item--full" data-id="modal-abilities">
-                                <span class="poke-label meta-label">Abilities</span>
-                                <span class="meta-value">Platzhalter <button class="info-btn" data-id="modal-abilities-info" onclick="openInfoOverlay('abilities')">?</button></span>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-                <div id="poke-info-overlay" class="poke-info-overlay hidden" data-id="modal-info-overlay" onclick="event.stopPropagation()"></div>
-            </div>
-
+            ${modalHeaderTemplate(data)}
+            ${modalInfoWrapperTemplate(data)}
             <div class="poke-moves-section" data-id="modal-moves">Gefilterte Moves-Liste – Platzhalter</div>
             <div class="poke-evolution-section" data-id="modal-evolution">Evolution Chain – Platzhalter</div>
+            ${modalNavTemplate()}
+        </div>
+    `;
+}
 
-            <div class="modal-nav" data-id="modal-nav">
-                <button id="modal-arrow-prev" type="button" data-id="modal-prev" onclick="navigatePokemon(-1)">‹</button>
-                <button id="modal-arrow-next" type="button" data-id="modal-next" onclick="navigatePokemon(1)">›</button>
+function modalHeaderTemplate({ id, name }) {
+    return `
+        <div class="poke-header" data-id="modal-header">
+            <h2 data-id="modal-name">${name.toUpperCase()}</h2>
+            <span class="poke-dex-number" data-id="modal-dex-number">#${id}</span>
+        </div>
+    `;
+}
+
+function modalInfoWrapperTemplate(data) {
+    return `
+        <div class="pokemon-info-wrapper" data-id="modal-info-wrapper">
+            <div class="pokemon-info-container" data-id="modal-info-container">
+                ${modalImageColumnTemplate(data)}
+                ${modalAbilitiesColumnTemplate(data)}
+            </div>
+            <div id="poke-info-overlay" class="poke-info-overlay hidden" data-id="modal-info-overlay" onclick="event.stopPropagation()"></div>
+        </div>
+    `;
+}
+
+function modalImageColumnTemplate({ name, image, typeBadgesMarkup }) {
+    return `
+        <div class="poke-image-column" data-id="modal-image-column">
+            <img class="modal-image" data-id="modal-image" src="${image}" alt="${name}">
+            <span class="poke-label type-label">Type</span>
+            <div class="poke-type-badges" data-id="modal-types">${typeBadgesMarkup}</div>
+            <div class="poke-weaknesses" data-id="modal-weaknesses">
+                <span class="poke-label weakness-label">Weaknesses</span>
+                <div class="weakness-icons" data-id="modal-weakness-icons">Platzhalter</div>
             </div>
         </div>
     `;
 }
 
-function statRowTemplate({ label, percent}) {
+function modalAbilitiesColumnTemplate(data) {
+    return `
+        <div class="poke-abilities-column" data-id="modal-abilities-column">
+            <p class="poke-flavor-text" data-id="modal-flavor-text">${data.flavorText}</p>
+            <div class="poke-stats" data-id="modal-stats">${data.statsMarkup}</div>
+            ${modalMetaGridTemplate(data)}
+        </div>
+    `;
+}
+
+function modalMetaGridTemplate(data) {
+    return `
+        <div class="poke-meta-grid" data-id="modal-meta-grid">
+            ${metaItemTemplate('modal-height', 'Height', data.heightMeters + ' m ' + infoButtonTemplate('height'), '')}
+            ${metaItemTemplate('modal-weight', 'Weight', data.weightKg + ' kg', '')}
+            ${metaItemTemplate('modal-gender', 'Gender', data.genderText, '')}
+            ${metaItemTemplate('modal-category', 'Category', data.category, '')}
+            ${metaItemTemplate('modal-abilities', 'Abilities', 'Platzhalter ' + infoButtonTemplate('abilities'), 'meta-item--full')}
+        </div>
+    `;
+}
+
+function metaItemTemplate(dataId, label, value, extraClass) {
+    return `
+        <div class="meta-item ${extraClass}" data-id="${dataId}">
+            <span class="poke-label meta-label">${label}</span>
+            <span class="meta-value">${value}</span>
+        </div>
+    `;
+}
+
+function infoButtonTemplate(type) {
+    return `<button class="info-btn" data-id="modal-${type}-info" onclick="openInfoOverlay('${type}')">?</button>`;
+}
+
+function modalNavTemplate() {
+    return `
+        <div class="modal-nav" data-id="modal-nav">
+            <button id="modal-arrow-prev" type="button" data-id="modal-prev" onclick="navigatePokemon(-1)">‹</button>
+            <button id="modal-arrow-next" type="button" data-id="modal-next" onclick="navigatePokemon(1)">›</button>
+        </div>
+    `;
+}
+
+function statRowTemplate({ label, percent }) {
     return `
         <div class="stat-row">
             <span class="stat-label">${label}</span>

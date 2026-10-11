@@ -72,7 +72,8 @@ h2.pokemon-card-name {
     padding: 0;
     background: #ffffff;
     color: #000000;
-    max-width: 95dvw;
+    width: 800px;
+    max-width: 80dvw;
     max-height: 95dvh;
     overflow: visible;
 }
@@ -82,6 +83,7 @@ h2.pokemon-card-name {
 }
 
 .poke-preview-content {
+    position: relative;
     padding: 24px;
     display: flex;
     flex-direction: column;
@@ -105,7 +107,7 @@ h2.pokemon-card-name {
 
 .modal-nav {
     position: absolute;
-    bottom: -150px;
+    bottom: 50%;
     width: 110%;
     display: flex;
     justify-content: space-between;
@@ -114,7 +116,7 @@ h2.pokemon-card-name {
 #modal-arrow-prev,
 #modal-arrow-next {
     font-weight: 800;
-    font-size: 50px;
+    font-size: 60px;
     color: #fff;
 }
 
@@ -195,12 +197,18 @@ h2.pokemon-card-name {
 .poke-meta-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
+    gap: 1.1rem;
     color: var(--color-gray);
     background-color: var(--btn-color);
-    padding: 2rem;
+    padding: 1.8rem;
     border-radius: 1rem;
     font-size: 0.9rem;
+}
+
+.meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
 }
 
 .meta-item--full {

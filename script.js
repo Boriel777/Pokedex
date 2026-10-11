@@ -88,22 +88,48 @@ function buildStatsMarkup(stats) {
     return stats.map(statRowTemplate).join('');
 }
 
-async function renderModalContent(id) {
+async function fetchModalData(id) {
     const res = await fetch(`${POKEAPI_BASE}/pokemon/${id}`);
-    if (!res.ok) return;
+    if (!res.ok) return null;
     const pokemon = await res.json();
-    currentPokemonId = pokemon.id;
-    const paddedId = String(pokemon.id).padStart(4, '0');
-    const name = pokemon.name;
-    const officialArt = pokemon.sprites.other['official-artwork'].front_default;
-    const homeSprite = pokemon.sprites.other.home.front_default;
-    const image = officialArt || homeSprite || pokemon.sprites.front_default || 'https://placehold.co/300x300';
-    const heightMeters = (pokemon.height / 10).toFixed(1);
-    const weightKg = (pokemon.weight / 10).toFixed(1);
-    const stats = buildStatsData(pokemon.stats);
-    const statsMarkup = buildStatsMarkup(stats);
-    document.getElementById('poke-card-modal').innerHTML = modalContentTemplate({ id: paddedId, name: name, image: image, heightMeters, weightKg, statsMarkup });
-    await updateNavButtons(pokemon.id);
+    const speciesRes = await fetch(pokemon.species.url);
+    const species = await speciesRes.json();
+    return { pokemon, species };
+}
+
+function getModalImage(sprites) {
+    const officialArt = sprites.other['official-artwork'].front_default;
+    const homeSprite = sprites.other.home.front_default;
+    return officialArt || homeSprite || sprites.front_default || 'https://placehold.co/300x300';
+}
+
+function buildPokemonData(pokemon) {
+    const types = pokemon.types.map(t => t.type.name);
+    return {
+        id: String(pokemon.id).padStart(4, '0'),
+        name: pokemon.name,
+        image: getModalImage(pokemon.sprites),
+        heightMeters: (pokemon.height / 10).toFixed(1),
+        weightKg: (pokemon.weight / 10).toFixed(1),
+        statsMarkup: buildStatsMarkup(buildStatsData(pokemon.stats)),
+        typeBadgesMarkup: buildTypeBadges(types)
+    }
+}
+
+function addSpeciesData(modalData, species) {
+    modalData.genderText = buildGenderText(species.gender_rate);
+    modalData.category = buildCategoryText(species.genera);
+    modalData.flavorText = buildFlavorText(species.flavor_text_entries);
+}
+
+async function renderModalContent(id) {
+    const data = await fetchModalData(id);
+    if (!data) return;
+    currentPokemonId = data.pokemon.id;
+    const modalData = buildPokemonData(data.pokemon);
+    addSpeciesData(modalData, data.species);
+    document.getElementById('poke-card-modal').innerHTML = modalContentTemplate(modalData);
+    await updateNavButtons(data.pokemon.id);
 }
 
 function buildStatsData(statsArray) {
@@ -115,6 +141,24 @@ function buildStatsData(statsArray) {
         value: s.base_stat,
         percent: Math.round((s.base_stat / 255) * 100)
     }));
+}
+
+function buildGenderText(genderRate) {
+    if (genderRate === -1) return 'Genderless';
+    const femalePercent = (genderRate / 8) * 100;
+    const malePercent = 100 - femalePercent;
+    return `♂ ${malePercent}% / ♀ ${femalePercent}%`;
+}
+
+function buildCategoryText(genera) {
+    const entry = genera.find(g => g.language.name === 'en');
+    return entry ? entry.genus : 'Unknown';
+}
+
+function buildFlavorText(flavorTextEntries) {
+    const entry = flavorTextEntries.find(f => f.language.name === 'en');
+    if (!entry) return '';
+    return entry.flavor_text.replace(/[\n\f]/g, ' ');
 }
 
 async function updateNavButtons(id) {
@@ -142,3 +186,4 @@ function openInfoOverlay(type) {
     overlay.innerHTML = type === 'height' ? heightOverlayTemplate(/*...*/) : abilityOverlayTemplate(/*...*/);
     overlay.classList.remove('hidden');
 }
+
