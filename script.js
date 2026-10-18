@@ -4,7 +4,6 @@ let currentPokemonId = null;
 let currentCryAudio = null;
 let currentCryUrl = null;
 
-
 async function init() {
     injectTypeColorStyles();
     await loadMorePokemon();
@@ -98,7 +97,8 @@ async function fetchModalData(id) {
     const species = await speciesRes.json();
     const typeNames = pokemon.types.map(t => t.type.name);
     const relations = await fetchTypeRelations(typeNames);
-    return { pokemon, species, relations };
+    const abilityDetails = await fetchAbilityDetails(pokemon.abilities);
+    return { pokemon, species, relations, abilityDetails };
 }
 
 function getModalImage(sprites) {
@@ -178,6 +178,32 @@ function buildFlavorText(flavorTextEntries) {
     return entry.flavor_text.replace(/[\n\f]/g, ' ');
 }
 
+function formatAbilityName(name) {
+    return name.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+}
+
+function getAbilityEffect(details) {
+    const entry = details.effect_entries.find(e => e.language.name === 'en');
+    if (entry) return entry.short_effect;
+    const flavor = details.flavor_text_entries.find(f => f.language.name === 'en');
+    return flavor ? flavor.flavor_text.replace(/[\n\f]/g, ' ') : 'No description available.';
+}
+
+function buildAbilityData(entry, details) {
+    return {
+        name: formatAbilityName(entry.ability.name),
+        hiddenLabel: entry.is_hidden ? ' (Hidden)' : '',
+        effect: getAbilityEffect(details)
+    };
+}
+
+function addAbilitiesData(modalData, data) {
+    const entries = data.pokemon.abilities;
+    const abilities = entries.map((entry, i) => buildAbilityData(entry, data.abilityDetails[i]));
+    modalData.abilitiesText = abilities.map(a => a.name + a.hiddenLabel).join(', ');
+    modalData.abilityItemsMarkup = buildAbilityItems(abilities);
+}
+
 async function updateNavButtons(id) {
     const nextRes = await fetch(`${POKEAPI_BASE}/pokemon/${id + 1}`);
     document.getElementById('modal-arrow-prev').classList.toggle('hidden', id <= 1);
@@ -195,13 +221,6 @@ function handleModalKeydown(event) {
 
 function closePokeModal() {
     document.getElementById('poke-card-modal').close();
-}
-
-function openInfoOverlay(type) {
-    const overlay = document.getElementById('poke-info-overlay');
-    overlay.className = `poke-info-overlay poke-info-overlay--${type}`;
-    overlay.innerHTML = type === 'height' ? heightOverlayTemplate(/*...*/) : abilityOverlayTemplate(/*...*/);
-    overlay.classList.remove('hidden');
 }
 
 function getCryUrl(cries) {
@@ -231,6 +250,15 @@ async function renderModalContent(id) {
     const modalData = buildPokemonData(data.pokemon);
     addSpeciesData(modalData, data.species);
     addWeaknessData(modalData, data.relations);
+    addAbilitiesData(modalData, data);
     document.getElementById('poke-card-modal').innerHTML = modalContentTemplate(modalData);
     await updateNavButtons(data.pokemon.id);
+}
+
+function buildAbilityItems(abilities) {
+    return abilities.map(a => abilityItemTemplate(a)).join('');
+}
+
+function setInfoOverlay(type) {
+    document.getElementById('poke-info-wrapper').setAttribute('data-overlay', type);
 }

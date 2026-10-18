@@ -98,10 +98,16 @@ h2.pokemon-card-name {
 }
 
 .modal-close-btn {
+    display: block;
     align-self: flex-end;
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     line-height: 1;
     cursor: pointer;
+    transition: all 125ms ease-in-out;
+}
+
+.modal-close-btn:hover {
+    transform: rotate(180deg);
 }
 
 .modal-nav {
@@ -217,11 +223,13 @@ h2.pokemon-card-name {
 }
 
 .poke-meta-grid {
+    position: relative;
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1.1rem;
     color: var(--color-gray);
     background-color: var(--btn-color);
+    overflow: clip;
     padding: 1.8rem;
     border-radius: 1rem;
     font-size: 0.9rem;
@@ -246,17 +254,45 @@ h2.pokemon-card-name {
     line-height: 1;
     cursor: pointer;
     transform: translateY(-3px);
+    transition: all 125ms ease-in-out;
+}
+
+.info-btn:hover {
+    box-shadow: 0 0 5px #000;
 }
 
 .poke-info-overlay {
+    display: none;
+    flex-direction: column;
+    gap: 15px;
     position: absolute;
     inset: 0;
-    background: #ffffff;
+    background: rgba(0, 0, 0, 0.85);
     z-index: 10;
+    padding: 8px 16px;
+    overflow-y: auto;
 }
 
-.poke-info-overlay.hidden {
-    display: none;
+.pokemon-info-wrapper[data-overlay="height"] .poke-info-overlay--height,
+.pokemon-info-wrapper[data-overlay="abilities"] .poke-info-overlay--abilities {
+    display: flex;
+}
+
+.info-close-btn {
+    display: block;
+    color: #fff;
+    font-size: 1.5rem;
+    align-self: flex-end;
+    transition: all 125ms ease-in-out;
+}
+
+.info-close-btn:hover {
+    transform: rotate(180deg);
+}
+
+li.ability-item {
+    margin-bottom: 1rem;
+    line-height: 1.2;
 }
 
 /* PokeModal Styles END */

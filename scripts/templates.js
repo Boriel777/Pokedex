@@ -41,14 +41,45 @@ function modalHeaderTemplate({ id, name }) {
     `;
 }
 
+function abilityItemTemplate({ name, hiddenLabel, effect }) {
+    return `
+        <li class="ability-item" data-id="ability-item">
+            <strong>${name}${hiddenLabel}</strong>
+            <p>${effect}</p>
+        </li>
+    `;
+}
+
+function heightOverlayTemplate() {
+    return `<p data-id="height-overlay-placeholder">Height comparison coming soon.</p>`;
+}
+
+function abilityOverlayTemplate(itemsMarkup) {
+    return `
+        <div class="poke-info-overlay poke-info-overlay--abilities" data-id="modal-abilities-overlay">
+            <button type="button" class="info-close-btn" data-id="abilities-overlay-close" onclick="setInfoOverlay('none')">×</button>
+            <h3 data-id="overlay-title">Abilities</h3>
+            <ul class="ability-list" data-id="ability-list">${itemsMarkup}</ul>
+        </div>
+    `;
+}
+
+function heightOverlayTemplate() {
+    return `
+        <div class="poke-info-overlay poke-info-overlay--height" data-id="modal-height-overlay">
+            <button type="button" class="info-close-btn" data-id="height-overlay-close" onclick="setInfoOverlay('none')">×</button>
+            <p>Height comparison coming soon.</p>
+        </div>
+    `;
+}
+
 function modalInfoWrapperTemplate(data) {
     return `
-        <div class="pokemon-info-wrapper" data-id="modal-info-wrapper">
+        <div id="poke-info-wrapper" class="pokemon-info-wrapper" data-id="modal-info-wrapper" data-overlay="none">
             <div class="pokemon-info-container" data-id="modal-info-container">
                 ${modalImageColumnTemplate(data)}
                 ${modalAbilitiesColumnTemplate(data)}
             </div>
-            <div id="poke-info-overlay" class="poke-info-overlay hidden" data-id="modal-info-overlay" onclick="event.stopPropagation()"></div>
         </div>
     `;
 }
@@ -89,7 +120,9 @@ function modalMetaGridTemplate(data) {
             ${metaItemTemplate('modal-weight', 'Weight', data.weightKg + ' kg', '')}
             ${metaItemTemplate('modal-gender', 'Gender', data.genderText, '')}
             ${metaItemTemplate('modal-category', 'Category', data.category, '')}
-            ${metaItemTemplate('modal-abilities', 'Abilities', 'Platzhalter ' + infoButtonTemplate('abilities'), 'meta-item--full')}
+            ${metaItemTemplate('modal-abilities', 'Abilities', data.abilitiesText + ' ' + infoButtonTemplate('abilities'), 'meta-item--full')}
+            ${heightOverlayTemplate()}
+            ${abilityOverlayTemplate(data.abilityItemsMarkup)}
         </div>
     `;
 }
@@ -104,7 +137,7 @@ function metaItemTemplate(dataId, label, value, extraClass) {
 }
 
 function infoButtonTemplate(type) {
-    return `<button class="info-btn" data-id="modal-${type}-info" onclick="openInfoOverlay('${type}')">?</button>`;
+    return `<button class="info-btn" data-id="modal-${type}-info" onclick="setInfoOverlay('${type}')">?</button>`;
 }
 
 function modalNavTemplate() {

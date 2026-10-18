@@ -24,7 +24,6 @@ async function fetchPokemonByType(typeName) {
 
 async function fetchPokemonByTypes(types) {
     if (types.length === 1) return fetchPokemonByType(types[0]);
-
     const [listA, listB] = await Promise.all(types.map(fetchPokemonByType));
     const namesB = new Set(listB.map(p => p.name));
     return listA.filter(p => namesB.has(p.name));
@@ -34,4 +33,9 @@ async function fetchTypeRelations(typeNames) {
     const requests = typeNames.map(name => fetch(`${POKEAPI_BASE}/type/${name}`).then(res => res.json()));
     const typeData = await Promise.all(requests);
     return typeData.map(data => data.damage_relations);
+}
+
+async function fetchAbilityDetails(abilityEntries) {
+    const requests = abilityEntries.map(entry => fetch(entry.ability.url).then(res => res.json()));
+    return Promise.all(requests);
 }

@@ -1,5 +1,10 @@
 /* Site Styles */
 
+html {
+    scrollbar-color: var(--btn-color) var(--color-primary-light);
+    scrollbar-width: thin;
+}
+
 body {
     position: relative;
     background-color: #000;
