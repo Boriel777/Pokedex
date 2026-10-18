@@ -93,7 +93,6 @@ h2.pokemon-card-name {
 
 .modal-image {
     width: 100%;
-    max-width: 280px;
     object-fit: contain;
     background-color: var(--color-gray);
 }
@@ -148,6 +147,29 @@ h2.pokemon-card-name {
     align-items: flex-start;
     gap: 12px;
     flex: 0 0 40%;
+}
+
+.poke-cry-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+
+#poke-cry {
+    background-color: var(--btn-color);
+    width: 25px;
+    height: 25px;
+    padding: 5px;
+    border-radius: 50px;
+    transition: all 150ms ease-in-out;
+}
+
+#poke-cry:hover {
+    transform: scale(1.1);
+}
+
+.poke-sound-img {
+    filter: invert(1) brightness(1) saturate(0%);
 }
 
 .poke-abilities-column {

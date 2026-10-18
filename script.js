@@ -1,6 +1,8 @@
 const darkTextTypes = new Set(['normal', 'grass', 'electric', 'ice', 'ground', 'flying', 'steel', 'fairy']);
 let isLoading = false;
 let currentPokemonId = null;
+let currentCryAudio = null;
+let currentCryUrl = null;
 
 
 async function init() {
@@ -94,7 +96,9 @@ async function fetchModalData(id) {
     const pokemon = await res.json();
     const speciesRes = await fetch(pokemon.species.url);
     const species = await speciesRes.json();
-    return { pokemon, species };
+    const typeNames = pokemon.types.map(t => t.type.name);
+    const relations = await fetchTypeRelations(typeNames);
+    return { pokemon, species, relations };
 }
 
 function getModalImage(sprites) {
@@ -116,20 +120,33 @@ function buildPokemonData(pokemon) {
     }
 }
 
+function multiplyDamage(multipliers, typeName, factor) {
+    if (multipliers[typeName] === undefined) multipliers[typeName] = 1;
+    multipliers[typeName] = multipliers[typeName] * factor;
+}
+
+function applyRelations(multipliers, relation) {
+    relation.double_damage_from.forEach(t => multiplyDamage(multipliers, t.name, 2));
+    relation.half_damage_from.forEach(t => multiplyDamage(multipliers, t.name, 0.5));
+    relation.no_damage_from.forEach(t => multiplyDamage(multipliers, t.name, 0));
+}
+
+function calculateWeaknesses(relations) {
+    const multipliers = {};
+    relations.forEach(relation => applyRelations(multipliers, relation));
+    const weak = Object.keys(typeColors).filter(typeName => multipliers[typeName] > 1);
+    return weak.sort((a, b) => multipliers[b] - multipliers[a]);
+}
+
+function addWeaknessData(modalData, relations) {
+    const weaknesses = calculateWeaknesses(relations);
+    modalData.weaknessMarkup = buildTypeBadges(weaknesses);
+}
+
 function addSpeciesData(modalData, species) {
     modalData.genderText = buildGenderText(species.gender_rate);
     modalData.category = buildCategoryText(species.genera);
     modalData.flavorText = buildFlavorText(species.flavor_text_entries);
-}
-
-async function renderModalContent(id) {
-    const data = await fetchModalData(id);
-    if (!data) return;
-    currentPokemonId = data.pokemon.id;
-    const modalData = buildPokemonData(data.pokemon);
-    addSpeciesData(modalData, data.species);
-    document.getElementById('poke-card-modal').innerHTML = modalContentTemplate(modalData);
-    await updateNavButtons(data.pokemon.id);
 }
 
 function buildStatsData(statsArray) {
@@ -187,3 +204,33 @@ function openInfoOverlay(type) {
     overlay.classList.remove('hidden');
 }
 
+function getCryUrl(cries) {
+    if (!cries) return null;
+    return cries.latest || cries.legacy || null;
+}
+
+function stopPokemonCry() {
+    if (!currentCryAudio) return;
+    currentCryAudio.pause();
+    currentCryAudio.currentTime = 0;
+}
+
+function playPokemonCry() {
+    stopPokemonCry();
+    if (!currentCryUrl) return;
+    currentCryAudio = new Audio(currentCryUrl);
+    currentCryAudio.play().catch(error => console.error('Could not play Pokémon cry:', error));
+}
+
+async function renderModalContent(id) {
+    const data = await fetchModalData(id);
+    if (!data) return;
+    currentPokemonId = data.pokemon.id;
+    currentCryUrl = getCryUrl(data.pokemon.cries);
+    stopPokemonCry();
+    const modalData = buildPokemonData(data.pokemon);
+    addSpeciesData(modalData, data.species);
+    addWeaknessData(modalData, data.relations);
+    document.getElementById('poke-card-modal').innerHTML = modalContentTemplate(modalData);
+    await updateNavButtons(data.pokemon.id);
+}

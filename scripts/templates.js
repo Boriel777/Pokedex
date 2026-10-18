@@ -53,15 +53,20 @@ function modalInfoWrapperTemplate(data) {
     `;
 }
 
-function modalImageColumnTemplate({ name, image, typeBadgesMarkup }) {
+function modalImageColumnTemplate({ name, image, typeBadgesMarkup, weaknessMarkup }) {
     return `
         <div class="poke-image-column" data-id="modal-image-column">
             <img class="modal-image" data-id="modal-image" src="${image}" alt="${name}">
-            <span class="poke-label type-label">Type</span>
+            <div class="poke-cry-wrapper" data-id="modal-cry-wrapper">
+                <span class="poke-label type-label">Type</span>
+                <button id="poke-cry" type="button" data-id="modal-cry-btn" aria-label="Play Pokémon cry" onclick="playPokemonCry()">
+                    <img class="poke-sound-img" src="./assets/img/sound.svg" alt="sound">
+                </button>
+            </div>
             <div class="poke-type-badges" data-id="modal-types">${typeBadgesMarkup}</div>
             <div class="poke-weaknesses" data-id="modal-weaknesses">
                 <span class="poke-label weakness-label">Weaknesses</span>
-                <div class="weakness-icons" data-id="modal-weakness-icons">Platzhalter</div>
+                <div class="weakness-icons" data-id="modal-weakness-icons">${weaknessMarkup}</div>
             </div>
         </div>
     `;

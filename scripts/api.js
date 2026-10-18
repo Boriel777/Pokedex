@@ -2,7 +2,6 @@ const POKEAPI_BASE = 'https://pokeapi.co/api/v2';
 let offset = 0;
 const BATCH_SIZE = 20;
 
-// api.js
 async function fetchPokemonBatch() {
     const res = await fetch(`${POKEAPI_BASE}/pokemon?limit=${BATCH_SIZE}&offset=${offset}`);
     if (!res.ok) throw new Error(`PokeAPI Fehler: ${res.status}`);
@@ -20,7 +19,7 @@ async function fetchPokemonByType(typeName) {
     const res = await fetch(`${POKEAPI_BASE}/type/${typeName}`);
     if (!res.ok) throw new Error(`Typ-Fetch Fehler: ${res.status}`);
     const data = await res.json();
-    return data.pokemon.map(p => p.pokemon); // Array von { name, url }
+    return data.pokemon.map(p => p.pokemon);
 }
 
 async function fetchPokemonByTypes(types) {
@@ -29,4 +28,10 @@ async function fetchPokemonByTypes(types) {
     const [listA, listB] = await Promise.all(types.map(fetchPokemonByType));
     const namesB = new Set(listB.map(p => p.name));
     return listA.filter(p => namesB.has(p.name));
+}
+
+async function fetchTypeRelations(typeNames) {
+    const requests = typeNames.map(name => fetch(`${POKEAPI_BASE}/type/${name}`).then(res => res.json()));
+    const typeData = await Promise.all(requests);
+    return typeData.map(data => data.damage_relations);
 }
