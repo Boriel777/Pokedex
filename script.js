@@ -3,6 +3,7 @@ let isLoading = false;
 let currentPokemonId = null;
 let currentCryAudio = null;
 let currentCryUrl = null;
+const TRAINER_HEIGHT_M = 1.7;
 
 async function init() {
     injectTypeColorStyles();
@@ -98,7 +99,8 @@ async function fetchModalData(id) {
     const typeNames = pokemon.types.map(t => t.type.name);
     const relations = await fetchTypeRelations(typeNames);
     const abilityDetails = await fetchAbilityDetails(pokemon.abilities);
-    return { pokemon, species, relations, abilityDetails };
+    const moves = await fetchLevelUpMoves(pokemon.moves);
+    return { pokemon, species, relations, abilityDetails, moves };
 }
 
 function getModalImage(sprites) {
@@ -113,6 +115,7 @@ function buildPokemonData(pokemon) {
         id: String(pokemon.id).padStart(4, '0'),
         name: pokemon.name,
         image: getModalImage(pokemon.sprites),
+        heightImage: null,
         heightMeters: (pokemon.height / 10).toFixed(1),
         weightKg: (pokemon.weight / 10).toFixed(1),
         statsMarkup: buildStatsMarkup(buildStatsData(pokemon.stats)),
@@ -248,11 +251,39 @@ async function renderModalContent(id) {
     currentCryUrl = getCryUrl(data.pokemon.cries);
     stopPokemonCry();
     const modalData = buildPokemonData(data.pokemon);
+    addDetailData(modalData, data);
+    await prepareHeightImage(modalData);
+    document.getElementById('poke-card-modal').innerHTML = modalContentTemplate(modalData);
+    await updateNavButtons(data.pokemon.id);
+}
+
+function addDetailData(modalData, data) {
     addSpeciesData(modalData, data.species);
     addWeaknessData(modalData, data.relations);
     addAbilitiesData(modalData, data);
-    document.getElementById('poke-card-modal').innerHTML = modalContentTemplate(modalData);
-    await updateNavButtons(data.pokemon.id);
+    addHeightData(modalData, data.pokemon);
+    addMovesData(modalData, data.moves);
+}
+
+function addHeightData(modalData, pokemon) {
+    const heightM = (pokemon.height || 1) / 10;
+    const stageM = Math.max(heightM, TRAINER_HEIGHT_M);
+    const step = getRulerStep(stageM);
+    modalData.pokemonScale = (heightM / stageM).toFixed(3);
+    modalData.redScale = (TRAINER_HEIGHT_M / stageM).toFixed(3);
+    modalData.tickGap = ((step / stageM) * 100).toFixed(2);
+    modalData.rulerStep = step;
+    modalData.trainerHeight = TRAINER_HEIGHT_M;
+}
+
+async function prepareHeightImage(modalData) {
+    try {
+        const result = await getVisibleImageBounds(modalData.image);
+        modalData.heightImage = result.src;
+    } catch (error) {
+        console.warn('Height image cropping failed:', error);
+        modalData.heightImage = modalData.image;
+    }
 }
 
 function buildAbilityItems(abilities) {
@@ -261,4 +292,35 @@ function buildAbilityItems(abilities) {
 
 function setInfoOverlay(type) {
     document.getElementById('poke-info-wrapper').setAttribute('data-overlay', type);
+}
+
+function getRulerStep(heightM) {
+    const steps = [0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50];
+    return steps.find(step => heightM / step <= 6) || 100;
+}
+
+function addMovesData(modalData, moves) {
+    modalData.movesMarkup = buildMovesMarkup(moves);
+}
+
+function buildMovesMarkup(moves) {
+    return moves.map(move => moveItemTemplate ({
+        name: formatMoveName(move.name),
+        type: move.type
+    })).join('');
+}
+
+function formatMoveName(name) {
+    return name.split('-')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+}
+
+function toggleMovesList(button) {
+    const movesList = document.getElementById('poke-moves-list');
+    const isExpanded = button.getAttribute('aria-expanded') === 'true';
+    const arrow = button.querySelector('span:last-child');
+    movesList.hidden = isExpanded;
+    button.setAttribute('aria-expanded', !isExpanded);
+    button.querySelector('.moves-toggle-text').textContent = isExpanded ? 'Show all moves' : 'Hide moves';
+    arrow.className = isExpanded ? 'moves-arrow--down' : 'moves-arrow--up'
 }

@@ -116,6 +116,7 @@ h2.pokemon-card-name {
     width: 110%;
     display: flex;
     justify-content: space-between;
+    pointer-events: none;
 }
 
 #modal-arrow-prev,
@@ -123,6 +124,7 @@ h2.pokemon-card-name {
     font-weight: 800;
     font-size: 60px;
     color: #fff;
+    pointer-events: all;
 }
 
 #modal-arrow-next {
@@ -181,7 +183,7 @@ h2.pokemon-card-name {
 .poke-abilities-column {
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
+    justify-content: space-between;
     gap: 25px;
     flex: 1;
 }
@@ -273,6 +275,13 @@ h2.pokemon-card-name {
     overflow-y: auto;
 }
 
+.poke-info-overlay--title {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
 .pokemon-info-wrapper[data-overlay="height"] .poke-info-overlay--height,
 .pokemon-info-wrapper[data-overlay="abilities"] .poke-info-overlay--abilities {
     display: flex;
@@ -294,5 +303,182 @@ li.ability-item {
     margin-bottom: 1rem;
     line-height: 1.2;
 }
+
+
+/* PokeScale Styles */
+
+.height-scene {
+    display: grid;
+    grid-template-columns: 84px 16px minmax(0, 1fr);
+    gap: 8px;
+    width: 100%;
+    height: 240px;
+    align-items: stretch;
+}
+
+.height-marks {
+    position: relative;
+    min-width: 0;
+    height: 100%;
+}
+
+.height-mark {
+    position: absolute;
+    transform: translateY(50%);
+    font-size: 0.8rem;
+    white-space: nowrap;
+}
+
+.height-mark--red {
+    left: 0;
+    bottom: calc(var(--red-scale) * 100%);
+}
+
+.height-mark--pokemon {
+    right: 0;
+    bottom: calc(var(--pokemon-scale) * 100%);
+}
+
+.height-mark::before,
+.height-swatch {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    margin-right: 4px;
+    border-radius: 50%;
+}
+
+.height-mark--red::before,
+.height-swatch--red {
+    background: #999;
+}
+
+.height-mark--pokemon::before,
+.height-swatch--pokemon {
+    background: #333;
+}
+
+.height-swatch--pokemon {
+    margin-left: 16px;
+}
+
+.height-ruler {
+    height: 100%;
+    background: repeating-linear-gradient(to top,
+            #999 0,
+            #999 1px,
+            transparent 1px,
+            transparent var(--tick-gap));
+}
+
+.height-stage {
+    position: relative;
+    height: 100%;
+    min-width: 0;
+    overflow: hidden;
+    border-bottom: 1px solid #999;
+}
+
+.height-silhouette {
+    position: absolute;
+    bottom: 0;
+    width: 50%;
+    height: 100%;
+    object-fit: contain;
+    object-position: bottom center;
+}
+
+.height-silhouette--pokemon {
+    left: 0;
+    z-index: 2;
+    filter: brightness(0) invert(0.2);
+    transform: scale(var(--pokemon-scale));
+    transform-origin: bottom center;
+}
+
+.height-silhouette--red {
+    right: 0;
+    z-index: 1;
+    filter: brightness(0) invert(0.6);
+    transform: scale(var(--red-scale));
+    transform-origin: bottom center;
+}
+
+.height-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    z-index: 3;
+    border-top: 1px dashed;
+    pointer-events: none;
+}
+
+.height-line--red {
+    bottom: calc(var(--red-scale) * 100% - 1px);
+    border-color: #999;
+}
+
+.height-line--pokemon {
+    bottom: calc(var(--pokemon-scale) * 100% - 1px);
+    border-color: #333;
+}
+
+/* PokeScale Styles END */
+
+/* PokeMoves Styles */
+
+.poke-moves-section {
+    margin-top: 2px;
+    width: 100%;
+}
+
+.poke-moves-header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.poke-moves-header h3 span {
+    font-size: 0.8rem;
+}
+
+ul#poke-moves-list {
+    margin-top: 10px;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 5px 15px;
+    width: 100%;
+    max-height: 1000px;
+    opacity: 1;
+    transition: all 180ms ease-in-out;
+}
+
+span.moves-arrow--up,
+span.moves-arrow--down {
+    display: inline-block;
+    transition: transform 180ms ease-in-out;
+}
+
+span.moves-arrow--up {
+    transform: rotate(-90deg);
+}
+
+span.moves-arrow--down {
+    transform: rotate(90deg);
+}
+
+ul#poke-moves-list[hidden] {
+    max-height: 0;
+    opacity: 0;
+    margin-top: 0;
+}
+
+li.poke-move-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+}
+
+/* PokeMoves Styles END */
 
 /* PokeModal Styles END */

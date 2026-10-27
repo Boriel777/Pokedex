@@ -1,5 +1,5 @@
-const POKEAPI_BASE = 'https://pokeapi.co/api/v2';
 let offset = 0;
+const POKEAPI_BASE = 'https://pokeapi.co/api/v2';
 const BATCH_SIZE = 20;
 
 async function fetchPokemonBatch() {
@@ -38,4 +38,28 @@ async function fetchTypeRelations(typeNames) {
 async function fetchAbilityDetails(abilityEntries) {
     const requests = abilityEntries.map(entry => fetch(entry.ability.url).then(res => res.json()));
     return Promise.all(requests);
+}
+
+async function fetchMoveDetails(move) {
+    try {
+        const response = await fetch(move.url);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        return { name: move.name, type: data.type.name };        
+    } catch (error) {
+        console.warn(`Move ${move.name} konnte nicht geladen werden:`, error);
+        return null;        
+    }
+}
+
+async function fetchLevelUpMoves(pokemonMoves) {
+    const levelUpMoves = pokemonMoves.filter(entry =>
+        entry.version_group_details.some(detail =>
+            detail.move_learn_method.name === 'level-up'
+        )
+    );
+    const uniqueMoves = [... new Map(levelUpMoves.map(entry => [entry.move.name, entry.move])
+    ).values()];
+    const moves = await Promise.all(uniqueMoves.map(fetchMoveDetails));
+    return moves.filter(Boolean);
 }
