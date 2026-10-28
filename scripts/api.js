@@ -63,3 +63,16 @@ async function fetchLevelUpMoves(pokemonMoves) {
     const moves = await Promise.all(uniqueMoves.map(fetchMoveDetails));
     return moves.filter(Boolean);
 }
+
+async function fetchPokemonById(id) {
+    const res = await fetch(`${POKEAPI_BASE}/pokemon/${id}`);
+    if (!res.ok) throw new Error(`Pokémon-Fetch Fehler: ${res.status}`);
+    return res.json();
+}
+
+async function fetchEvolutionChain(url, currentPokemon) {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`Evolution-Fetch Fehler: ${res.status}`);
+    const data = await res.json();
+    return buildEvolutionNode(data.chain, currentPokemon);
+}

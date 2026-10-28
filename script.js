@@ -100,7 +100,8 @@ async function fetchModalData(id) {
     const relations = await fetchTypeRelations(typeNames);
     const abilityDetails = await fetchAbilityDetails(pokemon.abilities);
     const moves = await fetchLevelUpMoves(pokemon.moves);
-    return { pokemon, species, relations, abilityDetails, moves };
+    const evolutionChain = await fetchEvolutionChain(species.evolution_chain.url, pokemon);
+    return { pokemon, species, relations, abilityDetails, moves, evolutionChain };
 }
 
 function getModalImage(sprites) {
@@ -251,6 +252,8 @@ async function renderModalContent(id) {
     currentCryUrl = getCryUrl(data.pokemon.cries);
     stopPokemonCry();
     const modalData = buildPokemonData(data.pokemon);
+    const evolutionPath = findEvolutionPath(data.evolutionChain, data.pokemon.id);
+    modalData.evolutionMarkup = evolutionChainTemplate(buildEvolutionMarkup(data.evolutionChain, data.pokemon.id, evolutionPath));
     addDetailData(modalData, data);
     await prepareHeightImage(modalData);
     document.getElementById('poke-card-modal').innerHTML = modalContentTemplate(modalData);
@@ -304,7 +307,7 @@ function addMovesData(modalData, moves) {
 }
 
 function buildMovesMarkup(moves) {
-    return moves.map(move => moveItemTemplate ({
+    return moves.map(move => moveItemTemplate({
         name: formatMoveName(move.name),
         type: move.type
     })).join('');
@@ -323,4 +326,45 @@ function toggleMovesList(button) {
     button.setAttribute('aria-expanded', !isExpanded);
     button.querySelector('.moves-toggle-text').textContent = isExpanded ? 'Show all moves' : 'Hide moves';
     arrow.className = isExpanded ? 'moves-arrow--down' : 'moves-arrow--up'
+}
+
+async function buildEvolutionNode(node, currentPokemon) {
+    const id = Number(node.species.url.split('/').filter(Boolean).pop());
+    const pokemon = id === currentPokemon.id ? currentPokemon : await fetchPokemonById(id);
+    const evolvesTo = await Promise.all(node.evolves_to.map(next => buildEvolutionNode(next, currentPokemon)));
+    return {
+        id, name: pokemon.name,
+        image: pokemon.sprites.other['official-artwork']?.front_default || pokemon.sprites.front_default,
+        types: pokemon.types.map(entry => entry.type.name),
+        evolvesTo
+    };
+}
+
+
+function findEvolutionPath(pokemon, currentId) {
+    if (pokemon.id === currentId) return [pokemon.id];
+    for (const next of pokemon.evolvesTo) {
+        const path = findEvolutionPath(next, currentId);
+        if (path) return [pokemon.id, ...path];
+    }
+    return null;
+}
+
+
+
+function buildEvolutionMarkup(pokemon, currentId, path) {
+    const isCurrent = pokemon.id === currentId;
+    const isPrevious = path.indexOf(pokemon.id) < path.indexOf(currentId)
+        && path.includes(pokemon.id);
+    const status = isCurrent ? 'current' : isPrevious ? 'previous' : 'next';
+    const currentClass = ` evolution-node--${status}`;
+    const types = pokemon.types.map(type => typeBadgesTemplate(type)).join('');
+    const children = pokemon.evolvesTo.map(next =>
+        buildEvolutionMarkup(next, currentId, path)
+    ).join('');
+    const branchClass = pokemon.evolvesTo.length > 1 ? ' evolution-next--branch' : '';
+    const nextMarkup = children
+        ? `<div class="evolution-next${branchClass}"><span class="evolution-arrow">›</span><div class="evolution-children">${children}</div></div>`
+        : '';
+    return evolutionNodeTemplate(pokemon, currentClass, types, nextMarkup);
 }

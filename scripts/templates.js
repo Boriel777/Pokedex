@@ -26,7 +26,7 @@ function modalContentTemplate(data) {
             ${modalHeaderTemplate(data)}
             ${modalInfoWrapperTemplate(data)}
             <section class="poke-moves-section" data-id="modal-moves">${movesSectionTemplate(data.movesMarkup, (data.movesMarkup.match(/<li\b/g) || []).length)}</section>
-            <section class="poke-evolution-section" data-id="modal-evolution">Evolution Chain – Platzhalter</section>
+            <section class="poke-evolution-section" data-id="modal-evolution">${data.evolutionMarkup}</section>
             ${modalNavTemplate()}
         </div>
     `;
@@ -219,5 +219,28 @@ function moveItemTemplate({ name, type }) {
             <span class="poke-move-name">${name}</span>
             <span class="pokemon-type pokemon-type-${type}">${type}</span>
         </li>
+    `;
+}
+
+function evolutionChainTemplate(chainMarkup) {
+    return `
+        <h3 class="poke-label">Evolution Chain</h3>
+        <div class="evolution-chain">${chainMarkup}</div>
+    `
+}
+
+
+function evolutionNodeTemplate(pokemon, currentClass, types, children) {
+    return `
+        <div class="evolution-node${currentClass}">
+            <button class="evolution-pokemon" type="button"
+                onclick="openPokeModal(${pokemon.id})">
+                <span class="evolution-image-circle"><img src="${pokemon.image}" alt="${pokemon.name}"class="evolution-image"></span>
+                <span class="evolution-name">${pokemon.name}</span>
+                <span class="evolution-number">#${String(pokemon.id).padStart(4, '0')}</span>
+                <span class="evolution-types">${types}</span>
+            </button>
+            ${children}
+        </div>
     `;
 }
