@@ -4,6 +4,15 @@ let currentPokemonId = null;
 let currentCryAudio = null;
 let currentCryUrl = null;
 const TRAINER_HEIGHT_M = 1.7;
+const MIN_SEARCH_LENGTH = 3;
+const SEARCH_DELAY_MS = 400;
+let browseCardsHTML = '';
+let allPokemon = [];
+let searchMatches = [];
+let searchShown = 0;
+let searchToken = 0;
+let searchTimer = null;
+let isSearchActive = false;
 
 async function init() {
     injectTypeColorStyles();
@@ -71,13 +80,91 @@ async function loadMorePokemon() {
     if (isLoading) return;
     isLoading = true;
     setLoadMoreState(true);
+    if (isSearchActive) await showSearchBatch(searchToken);
+    else await showBrowseBatch(searchToken);
+    setLoadMoreState(false);
+    isLoading = false;
+}
 
+async function showBrowseBatch(token) {
     const { results, hasMore } = await fetchPokemonBatch();
     const pokemonList = await fetchPokemonDetails(results);
+    if (token !== searchToken) return;
     renderPokemonCards(pokemonList);
+    setLoadMoreVisible(hasMore);
+}
 
-    hasMore ? setLoadMoreState(false) : document.getElementById('load-more-btn').remove();
-    isLoading = false;
+function setLoadMoreVisible(isVisible) {
+    document.getElementById('load-more-btn').classList.toggle('hidden', !isVisible);
+}
+
+function clearCards() {
+    document.getElementById('pokeCardsWrapper').innerHTML = '';
+}
+
+function showEmptyState() {
+    document.getElementById('pokeCardsWrapper').innerHTML = emptyStateTemplate();
+}
+
+function handleSearchInput(value) {
+    clearTimeout(searchTimer);
+    searchToken++;
+    const warning = document.getElementById('search-warning');
+    warning.classList.toggle('hidden', value.trim().length === 0 || value.trim().length >= MIN_SEARCH_LENGTH);
+    searchTimer = setTimeout(() => runSearch(value), SEARCH_DELAY_MS);
+}
+
+async function loadSearchNames() {
+    try {
+        if (allPokemon.length === 0) {
+            allPokemon = await fetchAllPokemonNames();
+        }
+        return true;
+    } catch (error) {
+        console.error('Pokémon-Namensliste konnte nicht geladen werden:', error);
+        showSearchError();
+        return false;
+    }
+}
+
+function showSearchError() {
+    document.getElementById('pokeCardsWrapper').innerHTML =
+        '<li class="poke-empty"><p>Search failed. Please try again.</p></li>';
+}
+
+async function runSearch(value) {
+    const term = value.trim().toLowerCase().replace(/\s+/g, '-');
+    const token = ++searchToken;
+    if (term.length < MIN_SEARCH_LENGTH) return leaveSearch();
+    if (!isSearchActive) browseCardsHTML = document.getElementById('pokeCardsWrapper').innerHTML;
+    isSearchActive = true;
+    setLoadMoreVisible(false);
+    if (!await loadSearchNames() || token !== searchToken) return;
+    searchMatches = allPokemon.filter(p => p.name.includes(term) || p.url.split('/').filter(Boolean).pop().padStart(4, '0').includes(term));
+    searchShown = 0;
+    clearCards();
+    if (searchMatches.length === 0) return showEmptyState();
+    try { await showSearchBatch(token); }
+    catch (error) { console.error('Pokémon-Suche fehlgeschlagen:', error); showSearchError(); }
+}
+
+async function showSearchBatch(token) {
+    const batch = searchMatches.slice(searchShown, searchShown + BATCH_SIZE);
+    const pokemonList = await fetchPokemonDetails(batch);
+    if (token !== searchToken) return;
+    searchShown += batch.length;
+    renderPokemonCards(pokemonList);
+    setLoadMoreVisible(searchShown < searchMatches.length);
+}
+
+async function leaveSearch() {
+    if (!isSearchActive) return;
+    searchToken++;
+    isSearchActive = false;
+    searchMatches = [];
+    searchShown = 0;
+    document.getElementById('pokeCardsWrapper').innerHTML = browseCardsHTML;
+    setLoadMoreVisible(true);
 }
 
 async function openPokeModal(id) {
@@ -252,8 +339,6 @@ async function renderModalContent(id) {
     currentCryUrl = getCryUrl(data.pokemon.cries);
     stopPokemonCry();
     const modalData = buildPokemonData(data.pokemon);
-    const evolutionPath = findEvolutionPath(data.evolutionChain, data.pokemon.id);
-    modalData.evolutionMarkup = evolutionChainTemplate(buildEvolutionMarkup(data.evolutionChain, data.pokemon.id, evolutionPath));
     addDetailData(modalData, data);
     await prepareHeightImage(modalData);
     document.getElementById('poke-card-modal').innerHTML = modalContentTemplate(modalData);
@@ -266,6 +351,18 @@ function addDetailData(modalData, data) {
     addAbilitiesData(modalData, data);
     addHeightData(modalData, data.pokemon);
     addMovesData(modalData, data.moves);
+    addEvolutionData(modalData, data);
+}
+
+function addEvolutionData(modalData, data) {
+    const speciesId = getIdFromUrl(data.pokemon.species.url);
+    const path = findEvolutionPath(data.evolutionChain, speciesId);
+    const markup = buildEvolutionMarkup(data.evolutionChain, speciesId, path);
+    modalData.evolutionMarkup = evolutionChainTemplate(markup);
+}
+
+function getIdFromUrl(url) {
+    return Number(url.split('/').filter(Boolean).pop());
 }
 
 function addHeightData(modalData, pokemon) {
@@ -329,8 +426,9 @@ function toggleMovesList(button) {
 }
 
 async function buildEvolutionNode(node, currentPokemon) {
-    const id = Number(node.species.url.split('/').filter(Boolean).pop());
-    const pokemon = id === currentPokemon.id ? currentPokemon : await fetchPokemonById(id);
+    const id = getIdFromUrl(node.species.url);
+    const isCurrent = id === getIdFromUrl(currentPokemon.species.url);
+    const pokemon = isCurrent ? currentPokemon : await fetchPokemonById(id);
     const evolvesTo = await Promise.all(node.evolves_to.map(next => buildEvolutionNode(next, currentPokemon)));
     return {
         id, name: pokemon.name,
@@ -340,7 +438,6 @@ async function buildEvolutionNode(node, currentPokemon) {
     };
 }
 
-
 function findEvolutionPath(pokemon, currentId) {
     if (pokemon.id === currentId) return [pokemon.id];
     for (const next of pokemon.evolvesTo) {
@@ -349,8 +446,6 @@ function findEvolutionPath(pokemon, currentId) {
     }
     return null;
 }
-
-
 
 function buildEvolutionMarkup(pokemon, currentId, path) {
     const isCurrent = pokemon.id === currentId;

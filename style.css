@@ -197,6 +197,10 @@ main {
     background: var(--btn-hover-color);
 }
 
+#load-more-btn.hidden {
+    display: none;
+}
+
 #load-more-btn:disabled {
     background: var(--color-gray);
     cursor: not-allowed;
@@ -228,6 +232,28 @@ header {
     flex-wrap: wrap;
     justify-content: center;
     gap: 25px;
+}
+
+.poke-empty {
+    width: 100%;
+    padding: 40px 0;
+    text-align: center;
+    list-style: none;
+}
+
+.poke-search-wrapper {
+    position: relative;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.search-warning {
+    top: 35px;
+    position: absolute;
+    color: #e74c3c;
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+    width: max-content;
 }
 
 /* Pokemon Grid Styles END */

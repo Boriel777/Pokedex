@@ -244,3 +244,11 @@ function evolutionNodeTemplate(pokemon, currentClass, types, children) {
         </div>
     `;
 }
+
+function emptyStateTemplate() {
+    return `
+        <li class="poke-empty" data-id="search-empty">
+            <p>No Pokémon found. Check the spelling?</p>
+        </li>
+    `;
+}

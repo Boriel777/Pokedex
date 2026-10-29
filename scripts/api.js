@@ -10,6 +10,13 @@ async function fetchPokemonBatch() {
     return { results: data.results, hasMore: data.next !== null };
 }
 
+async function fetchAllPokemonNames() {
+    const res = await fetch(`${POKEAPI_BASE}/pokemon?limit=100000`);
+    if (!res.ok) throw new Error(`Namensliste-Fehler: ${res.status}`);
+    const data = await res.json();
+    return data.results;
+}
+
 async function fetchPokemonDetails(basicList) {
     const promises = basicList.map(p => fetch(p.url).then(r => r.json()));
     return Promise.all(promises);
