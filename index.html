@@ -22,9 +22,12 @@
 
 <body onload="init()">
     <header>
-        <img class="header-logo" src="/assets/img/Pokédex_logo.png" alt="PokeDex Logo">
+        <a href="#"><img class="header-logo" src="/assets/img/Pokédex_logo.png" alt="PokeDex Logo"></a>
+        <button id="filter-toggle" type="button" class="pill-btn" aria-expanded="false" aria-controls="filter-panel"
+            data-id="filter-toggle" onclick="toggleFilterPanel()"><img src="/assets/img/Filter.svg" alt="filter icon"></button>
         <div class="poke-search-wrapper">
-            <input type="search" aria-label="Search" id="poke-search-bar" oninput="handleSearchInput(this.value)" onkeydown="if (event.key === 'Enter') runSearch(this.value)">
+            <input type="search" aria-label="Search" id="poke-search-bar" oninput="handleSearchInput(this.value)"
+                onkeydown="if (event.key === 'Enter') runSearch(this.value)">
             <p id="search-warning" class="search-warning hidden">Please enter at least 3 characters.</p>
         </div>
     </header>
@@ -32,6 +35,7 @@
         <h1>PokéDex</h1>
         <p>Enjoy this fan-based Pokédex project.</p>
         <div id="pokeDexMainWrapper">
+            <aside id="filter-panel" class="filter-panel hidden" data-id="filter-panel" onanimationend="this.classList.remove('shake')"></aside>
             <ul id="pokeCardsWrapper"></ul>
         </div>
         <aside id="pokeTypeFilter"></aside>

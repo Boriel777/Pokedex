@@ -9,6 +9,7 @@ body {
     position: relative;
     background-color: #000;
     color: #fff;
+    overflow-x: clip;
 }
 
 body:has(#poke-card-modal[open]) {
@@ -222,7 +223,13 @@ header {
 }
 
 #pokeDexMainWrapper {
-    max-width: 1200px;
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: flex-start;
+    justify-content: center;
+    gap:20px;
+    position: relative;
+    width: 100%;
     padding: 15px 20px;
     margin: 0 auto;
 }

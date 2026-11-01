@@ -245,10 +245,30 @@ function evolutionNodeTemplate(pokemon, currentClass, types, children) {
     `;
 }
 
-function emptyStateTemplate() {
+function emptyStateTemplate(message) {
     return `
         <li class="poke-empty" data-id="search-empty">
-            <p>No Pokémon found. Check the spelling?</p>
+            <p>${message}</p>
+        </li>
+    `;
+}
+
+function filterPanelTemplate(badgesMarkup) {
+    return `
+        <h2 class="filter-title" data-id="filter-title">Filter by type</h2>
+        <ul class="filter-list" data-id="filter-list">${badgesMarkup}</ul>
+        <button type="button" class="filter-reset-btn" data-id="filter-reset" onclick="resetTypeFilter()">Reset</button>
+    `;
+}
+
+function filterBadgeTemplate({ type, iconUrl }) {
+    return `
+        <li class="filter-item" data-id="filter-item-${type}">
+            <button type="button" class="filter-btn pokemon-type pokemon-type-${type}" data-id="filter-btn-${type}"
+                data-type="${type}" aria-pressed="false" onclick="toggleTypeFilter('${type}')">
+                <img class="filter-icon" src="${iconUrl}" alt="" data-id="filter-icon-${type}">
+                <span class="filter-label">${type}</span>
+            </button>
         </li>
     `;
 }

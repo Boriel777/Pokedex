@@ -1,12 +1,20 @@
+'use strict';
+
 const darkTextTypes = new Set(['normal', 'grass', 'electric', 'ice', 'ground', 'flying', 'steel', 'fairy']);
+const SEARCH_EMPTY_TEXT = 'No Pokémon found. Check the spelling?';
+const FILTER_EMPTY_TEXT = 'No Pokémon with this type combination found.';
+const COMBINED_EMPTY_TEXT = 'No Pokémon in this filter match your search.';
+const TRAINER_HEIGHT_M = 1.7;
+const MIN_SEARCH_LENGTH = 3;
+const SEARCH_DELAY_MS = 400;
+const MAX_ACTIVE_TYPES = 2;
 let isLoading = false;
 let currentPokemonId = null;
 let currentCryAudio = null;
 let currentCryUrl = null;
-const TRAINER_HEIGHT_M = 1.7;
-const MIN_SEARCH_LENGTH = 3;
-const SEARCH_DELAY_MS = 400;
+let currentTerm = '';
 let browseCardsHTML = '';
+let activeTypes = [];
 let allPokemon = [];
 let searchMatches = [];
 let searchShown = 0;
@@ -16,6 +24,7 @@ let isSearchActive = false;
 
 async function init() {
     injectTypeColorStyles();
+    renderFilterPanel();
     await loadMorePokemon();
 }
 
@@ -102,8 +111,8 @@ function clearCards() {
     document.getElementById('pokeCardsWrapper').innerHTML = '';
 }
 
-function showEmptyState() {
-    document.getElementById('pokeCardsWrapper').innerHTML = emptyStateTemplate();
+function showEmptyState(message) {
+    document.getElementById('pokeCardsWrapper').innerHTML = emptyStateTemplate(message);
 }
 
 function handleSearchInput(value) {
@@ -132,20 +141,46 @@ function showSearchError() {
         '<li class="poke-empty"><p>Search failed. Please try again.</p></li>';
 }
 
-async function runSearch(value) {
+function runSearch(value) {
     const term = value.trim().toLowerCase().replace(/\s+/g, '-');
+    currentTerm = term.length >= MIN_SEARCH_LENGTH ? term : '';
+    return refreshResults();
+}
+
+async function refreshResults() {
+    if (!currentTerm && activeTypes.length === 0) return leaveSearch();
     const token = ++searchToken;
-    if (term.length < MIN_SEARCH_LENGTH) return leaveSearch();
-    if (!isSearchActive) browseCardsHTML = document.getElementById('pokeCardsWrapper').innerHTML;
+    saveBrowseCards();
     isSearchActive = true;
     setLoadMoreVisible(false);
-    if (!await loadSearchNames() || token !== searchToken) return;
-    searchMatches = allPokemon.filter(p => p.name.includes(term) || p.url.split('/').filter(Boolean).pop().padStart(4, '0').includes(term));
+    try { await showResults(token); }
+    catch (error) { console.error('Search/Filter failed', error); showSearchError(); }
+}
+
+async function showResults(token) {
+    const candidates = await getCandidates();
+    if (!candidates || token !== searchToken) return;
+    searchMatches = candidates.filter(matchesTerm);
     searchShown = 0;
     clearCards();
-    if (searchMatches.length === 0) return showEmptyState();
-    try { await showSearchBatch(token); }
-    catch (error) { console.error('Pokémon-Suche fehlgeschlagen:', error); showSearchError(); }
+    if (searchMatches.length === 0) return showEmptyState(getEmptyText());
+    await showSearchBatch(token)
+}
+
+async function getCandidates() {
+    if (activeTypes.length > 0) return sortByDexId(await fetchPokemonByTypes(activeTypes));
+    return await loadSearchNames() ? allPokemon : null;
+}
+
+function matchesTerm(pokemon) {
+    if (!currentTerm) return true;
+    const dexId = String(getIdFromUrl(pokemon.url)).padStart(4, '0');
+    return pokemon.name.includes(currentTerm) || dexId.includes(currentTerm);
+}
+
+function getEmptyText() {
+    if (currentTerm && activeTypes.length > 0) return COMBINED_EMPTY_TEXT;
+    return currentTerm ? SEARCH_EMPTY_TEXT : FILTER_EMPTY_TEXT;
 }
 
 async function showSearchBatch(token) {
@@ -165,6 +200,11 @@ async function leaveSearch() {
     searchShown = 0;
     document.getElementById('pokeCardsWrapper').innerHTML = browseCardsHTML;
     setLoadMoreVisible(true);
+}
+
+function saveBrowseCards() {
+    if (isSearchActive) return;
+    browseCardsHTML = document.getElementById('pokeCardsWrapper').innerHTML;
 }
 
 async function openPokeModal(id) {
@@ -462,4 +502,50 @@ function buildEvolutionMarkup(pokemon, currentId, path) {
         ? `<div class="evolution-next${branchClass}"><span class="evolution-arrow">›</span><div class="evolution-children">${children}</div></div>`
         : '';
     return evolutionNodeTemplate(pokemon, currentClass, types, nextMarkup);
+}
+
+function getTypeIconUrl(type) {
+    const name = type.charAt(0).toUpperCase() + type.slice(1);
+    return `./assets/img/Type_${name}_icon.png`;
+}
+
+function buildFilterBadges() {
+    return Object.keys(typeColors).map(type => 
+        filterBadgeTemplate({ type, iconUrl: getTypeIconUrl(type) })
+    ).join('');
+}
+
+function renderFilterPanel() {
+    document.getElementById('filter-panel').innerHTML = filterPanelTemplate(buildFilterBadges());
+}
+
+function toggleFilterPanel() {
+    const isHidden = document.getElementById('filter-panel').classList.toggle('hidden');
+    document.getElementById('filter-toggle').setAttribute('aria-expanded', !isHidden);
+}
+
+function toggleTypeFilter(type) {
+    if (activeTypes.includes(type)) activeTypes = activeTypes.filter(t => t !== type); 
+    else  if (activeTypes.length < MAX_ACTIVE_TYPES) activeTypes.push(type);
+    else return document.getElementById('filter-panel').classList.add('shake');
+    updateFilterButtons();
+    refreshResults();
+}
+
+function updateFilterButtons() {
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        const isActive = activeTypes.includes(btn.dataset.type);
+        btn.setAttribute('aria-pressed', isActive);
+        btn.classList.toggle('filter-btn--active', isActive);
+    });
+}
+
+function resetTypeFilter() {
+    activeTypes = [];
+    updateFilterButtons();
+    refreshResults();
+}
+
+function sortByDexId(list) {
+    return list.sort((a, b) => getIdFromUrl(a.url) - getIdFromUrl(b.url));
 }
