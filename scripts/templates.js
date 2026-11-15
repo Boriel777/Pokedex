@@ -21,8 +21,8 @@ function typeBadgesTemplate(t) {
 
 function modalContentTemplate(data) {
     return `
-        <div class="poke-preview-content" data-id="modal-content" onclick="event.stopPropagation()">
-            <button type="button" class="modal-close-btn" data-id="modal-close" onclick="closePokeModal()">×</button>
+        <div class="poke-preview-content" data-id="overlay-${data.name}" onclick="event.stopPropagation()">
+            <button type="button" class="modal-close-btn" data-id="close-dialog-button" onclick="closePokeModal()" aria-label="Close dialog">×</button>
             ${modalHeaderTemplate(data)}
             ${modalInfoWrapperTemplate(data)}
             <section class="poke-moves-section" data-id="modal-moves">${movesSectionTemplate(data.movesMarkup, (data.movesMarkup.match(/<li\b/g) || []).length)}</section>
@@ -55,7 +55,7 @@ function modalInfoWrapperTemplate(data) {
 function modalImageColumnTemplate({ name, image, typeBadgesMarkup, weaknessMarkup }) {
     return `
         <div class="poke-image-column" data-id="modal-image-column">
-            <img class="modal-image" data-id="modal-image" src="${image}" alt="${name}">
+            <img class="modal-image" data-id="dialog-image" src="${image}" alt="${name}">
             <div class="poke-cry-wrapper" data-id="modal-cry-wrapper">
                 <h3 class="poke-label type-label">Type</h3>
                 <button id="poke-cry" type="button" data-id="modal-cry-btn" aria-label="Play Pokémon cry" onclick="playPokemonCry()">
@@ -105,14 +105,14 @@ function metaItemTemplate(dataId, label, value, extraClass) {
 }
 
 function infoButtonTemplate(type) {
-    return `<button class="info-btn" data-id="modal-${type}-info" onclick="setInfoOverlay('${type}')">?</button>`;
+    return `<button class="info-btn" data-id="modal-${type}-info" aria-label="Show ${type} info" onclick="setInfoOverlay('${type}')">?</button>`;
 }
 
 function modalNavTemplate() {
     return `
         <div class="modal-nav" data-id="modal-nav">
-            <button id="modal-arrow-prev" type="button" data-id="modal-prev" onclick="navigatePokemon(-1)">‹</button>
-            <button id="modal-arrow-next" type="button" data-id="modal-next" onclick="navigatePokemon(1)">›</button>
+            <button id="modal-arrow-prev" type="button" data-id="prev-button" aria-label="Previous Pokémon" onclick="navigatePokemon(-1)">‹</button>
+            <button id="modal-arrow-next" type="button" data-id="next-button" aria-label="Next Pokémon" onclick="navigatePokemon(1)">›</button>
         </div>
     `;
 }
@@ -141,7 +141,7 @@ function abilityOverlayTemplate(itemsMarkup) {
     return `
         <div class="poke-info-overlay poke-info-overlay--abilities" data-id="modal-abilities-overlay">
             <div class="poke-info-overlay--title">
-                <button type="button" class="info-close-btn" data-id="abilities-overlay-close" onclick="setInfoOverlay('none')">×</button>
+                <button type="button" class="info-close-btn" data-id="abilities-overlay-close" aria-label="Close abilities info" onclick="setInfoOverlay('none')">×</button>
                 <h3 data-id="overlay-title">Abilities</h3>
             </div>
             <ul class="ability-list" data-id="ability-list">${itemsMarkup}</ul>
@@ -153,7 +153,7 @@ function heightOverlayTemplate(data) {
     return `
         <div class="poke-info-overlay poke-info-overlay--height" data-id="modal-height-overlay"
             style="--pokemon-scale: ${data.pokemonScale}; --red-scale: ${data.redScale}; --tick-gap: ${data.tickGap}%;">
-            <button type="button" class="info-close-btn" data-id="height-overlay-close" onclick="setInfoOverlay('none')">×</button>
+            <button type="button" class="info-close-btn" data-id="height-overlay-close" aria-label="Close height comparison" onclick="setInfoOverlay('none')">×</button>
             <h3 data-id="height-overlay-title">Height comparison</h3>
             ${heightSceneTemplate(data)}
             ${heightLegendTemplate(data.name)}
@@ -247,7 +247,7 @@ function evolutionNodeTemplate(pokemon, currentClass, types, children) {
 
 function emptyStateTemplate(message) {
     return `
-        <li class="poke-empty" data-id="search-empty">
+        <li class="poke-empty" data-id="not-found">
             <p>${message}</p>
         </li>
     `;

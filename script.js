@@ -6,7 +6,6 @@ const FILTER_EMPTY_TEXT = 'No Pokémon with this type combination found.';
 const COMBINED_EMPTY_TEXT = 'No Pokémon in this filter match your search.';
 const TRAINER_HEIGHT_M = 1.7;
 const MIN_SEARCH_LENGTH = 3;
-const SEARCH_DELAY_MS = 400;
 const MAX_ACTIVE_TYPES = 2;
 let isLoading = false;
 let currentPokemonId = null;
@@ -19,7 +18,6 @@ let allPokemon = [];
 let searchMatches = [];
 let searchShown = 0;
 let searchToken = 0;
-let searchTimer = null;
 let isSearchActive = false;
 
 async function init() {
@@ -116,11 +114,16 @@ function showEmptyState(message) {
 }
 
 function handleSearchInput(value) {
-    clearTimeout(searchTimer);
-    searchToken++;
-    const warning = document.getElementById('search-warning');
-    warning.classList.toggle('hidden', value.trim().length === 0 || value.trim().length >= MIN_SEARCH_LENGTH);
-    searchTimer = setTimeout(() => runSearch(value), SEARCH_DELAY_MS);
+    const length = value.trim().length;
+    document.getElementById('search-btn').disabled = length < MIN_SEARCH_LENGTH;
+    document.getElementById('search-warning').classList.toggle('hidden', length === 0 || length >= MIN_SEARCH_LENGTH);
+    if (length === 0) runSearch('');
+}
+
+function submitSearch(event) {
+    event.preventDefault();
+    const value = document.getElementById('poke-search-bar').value;
+    if (value.trim().length >= MIN_SEARCH_LENGTH) runSearch(value);
 }
 
 async function loadSearchNames() {
@@ -138,7 +141,7 @@ async function loadSearchNames() {
 
 function showSearchError() {
     document.getElementById('pokeCardsWrapper').innerHTML =
-        '<li class="poke-empty"><p>Search failed. Please try again.</p></li>';
+        '<li class="poke-empty" data-id="search-error"><p>Search failed. Please try again.</p></li>';
 }
 
 function runSearch(value) {

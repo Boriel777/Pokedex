@@ -5,49 +5,54 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" href="styles/fonts.css">
-    <link rel="stylesheet" href="styles/root.css">
-    <link rel="stylesheet" href="styles/templates.css">
-    <link rel="stylesheet" href="style.css">
-    <link rel="shortcut icon" href="/assets/img/Poké_Ball_icon.svg" type="image/x-icon">
+    <link rel="stylesheet" href="./styles/fonts.css">
+    <link rel="stylesheet" href="./styles/root.css">
+    <link rel="stylesheet" href="./styles/templates.css">
+    <link rel="stylesheet" href="./style.css">
+    <link rel="icon" href="./assets/img/Poke_Ball_icon.svg" type="image/svg+xml">
 
-    <script src="/scripts/api.js"></script>
-    <script src="/scripts/colors.js"></script>
-    <script src="/scripts/interactive_bg.js"></script>
-    <script defer src="/scripts/templates.js"></script>
-    <script defer src="/scripts/height-scaling.js"></script>
-    <script defer src="script.js"></script>
+    <script src="./scripts/api.js"></script>
+    <script src="./scripts/colors.js"></script>
+    <script src="./scripts/interactive_bg.js"></script>
+    <script defer src="./scripts/templates.js"></script>
+    <script defer src="./scripts/height-scaling.js"></script>
+    <script defer src="./script.js"></script>
     <title>PokéDex App</title>
 </head>
 
 <body onload="init()">
     <header>
-        <a href="#"><img class="header-logo" src="/assets/img/Pokédex_logo.png" alt="PokeDex Logo"></a>
+        <a href="#"><img class="header-logo" src="./assets/img/Pokedex_logo.png" alt="PokeDex Logo"></a>
         <button id="filter-toggle" type="button" class="pill-btn" aria-expanded="false" aria-controls="filter-panel"
-            data-id="filter-toggle" onclick="toggleFilterPanel()"><img src="/assets/img/Filter.svg" alt="filter icon"></button>
-        <div class="poke-search-wrapper">
-            <input type="search" aria-label="Search" id="poke-search-bar" oninput="handleSearchInput(this.value)"
-                onkeydown="if (event.key === 'Enter') runSearch(this.value)">
-            <p id="search-warning" class="search-warning hidden">Please enter at least 3 characters.</p>
-        </div>
-    </header>
-    <main>
+            aria-label="Toggle type filter" data-id="filter-toggle" onclick="toggleFilterPanel()"><img
+                src="./assets/img/Filter.svg" alt="filter icon" alt=""></button>
         <h1>PokéDex</h1>
+        <form class="poke-search-wrapper" data-id="search-form" onsubmit="submitSearch(event)">
+            <input type="search" aria-label="Search Pokémon by name or number" id="poke-search-bar" autocomplete="off"
+                placeholder="Name or number" oninput="handleSearchInput(this.value)" data-id="search-input">
+            <button id="search-btn" data-id="search-button" type="submit" aria-label="Search" disabled>
+                <img class="search-btn-icon" src="./assets/img/search.svg" alt="">
+            </button>
+            <p id="search-warning" class="search-warning hidden">*Please enter at least 3 characters.</p>
+        </form>
+    </header>
+    <main data-id="content">
         <p>Enjoy this fan-based Pokédex project.</p>
         <div id="pokeDexMainWrapper">
-            <aside id="filter-panel" class="filter-panel hidden" data-id="filter-panel" onanimationend="this.classList.remove('shake')"></aside>
+            <aside id="filter-panel" class="filter-panel hidden" data-id="filter-panel"
+                onanimationend="this.classList.remove('shake')"></aside>
             <ul id="pokeCardsWrapper"></ul>
         </div>
-        <aside id="pokeTypeFilter"></aside>
-        <button id="load-more-btn" class="pill-btn" onclick="loadMorePokemon()">Load more Pokémon</button>
+        <button id="load-more-btn" class="pill-btn" onclick="loadMorePokemon()" data-id="load-more-button">Load more
+            Pokémon</button>
     </main>
     <footer>
         ©2026 - Dalibor Durbas
 
         <div>Icons made from <a href="https://www.onlinewebfonts.com/icon">svg icons</a> is licensed by CC BY 4.0</div>
     </footer>
-    <dialog class="poke-preview-wrapper" id="poke-card-modal" onclick="closePokeModal()"
-        onkeydown="handleModalKeydown(event)"></dialog>
+    <dialog class="poke-preview-wrapper" id="poke-card-modal" aria-label="Pokémon details" onclick="closePokeModal()"
+        onkeydown="handleModalKeydown(event)" data-id="dialog"></dialog>
     <div class="gradient-bg">
         <svg class="filter-defs" xmlns="http://www.w3.org/2000/svg">
             <defs>

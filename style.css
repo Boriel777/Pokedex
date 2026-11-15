@@ -163,8 +163,8 @@ body:has(#poke-card-modal[open]) {
 
 header #poke-search-bar {
     padding: 6px 8px;
-    border-radius: 5px;
-    border: solid 3px var(--color-primary-light);
+    border-radius: 5px 0 0 5px;
+    border: solid 3px var(--btn-color);
     transition: all 150ms ease-in-out;
 }
 
@@ -172,6 +172,22 @@ header #poke-search-bar:focus-visible {
     outline: -webkit-focus-ring-color solid var(--color-secondary) 1px;
     outline: solid var(--color-secondary) 1px;
     border: solid 3px var(--color-secondary-dark);
+}
+
+#search-btn {
+    background-color: var(--btn-color);
+    width: 40px;
+    padding: 0 10px;
+    border-radius: 0 5px 5px 0;
+}
+
+#search-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.search-btn-icon {
+    filter: invert(1);
 }
 
 main {
@@ -238,6 +254,7 @@ header {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
+    width: 100%;
     gap: 25px;
 }
 

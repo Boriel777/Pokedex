@@ -667,7 +667,7 @@ li.poke-move-item {
 #filter-toggle {
     position: absolute;
     right: -85px;
-    top: 200px;
+    top: 150px;
     background-color: var(--btn-color);
     padding-right: 100px;
     border-radius: 50px;
