@@ -82,6 +82,21 @@ If you have suggestions or spot something worth improving, feel free to open an 
 
 ---
 
+## 📄 License & Credits
+
+### Original source code
+The original source code of this project, including self-created UI elements such as the filter icons, is licensed under the [MIT License](LICENSE).
+
+### Pokémon content
+Pokémon names, characters, artwork, sprites, and sounds are provided through the [PokéAPI](https://pokeapi.co/).
+
+Pokémon and all related characters, names, designs, artwork, and audio remain the property of their respective rights holders. They are **not covered by the MIT License**.
+
+This is an independent, fan-made educational project and is not affiliated with, endorsed, or sponsored by Nintendo, Game Freak, or The Pokémon Company.
+
+### Third-party assets
+External icons and other third-party assets remain subject to their respective licenses and attribution requirements.
+
 ## 🙋‍♂️ About Me
 
 I'm Dali – Graphic & Web Designer and Developer Academy student, building projects to strengthen my **JavaScript, frontend development, and problem-solving skills**.
