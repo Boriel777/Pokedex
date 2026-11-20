@@ -85,9 +85,11 @@ If you have suggestions or spot something worth improving, feel free to open an 
 ## 📄 License & Credits
 
 ### Original source code
+
 The original source code of this project, including self-created UI elements such as the filter icons, is licensed under the [MIT License](LICENSE).
 
 ### Pokémon content
+
 Pokémon names, characters, artwork, sprites, and sounds are provided through the [PokéAPI](https://pokeapi.co/).
 
 Pokémon and all related characters, names, designs, artwork, and audio remain the property of their respective rights holders. They are **not covered by the MIT License**.
@@ -96,9 +98,7 @@ This is an independent, fan-made educational project and is not affiliated with,
 
 ### Third-party assets
 
-External SVG icons: OnlineWebFonts – credited under CC BY 4.0, where applicable.
-
-Custom filter icons: Created by the author.
+- **External SVG icons:** Downloaded from [OnlineWebFonts](https://www.onlinewebfonts.com/icon). The download page provided a CC BY 4.0 attribution notice. Individual asset authors and license details have not been independently verified.
 
 ## 🙋‍♂️ About Me
 
