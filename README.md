@@ -95,7 +95,10 @@ Pokémon and all related characters, names, designs, artwork, and audio remain t
 This is an independent, fan-made educational project and is not affiliated with, endorsed, or sponsored by Nintendo, Game Freak, or The Pokémon Company.
 
 ### Third-party assets
-External icons and other third-party assets remain subject to their respective licenses and attribution requirements.
+
+External SVG icons: OnlineWebFonts – credited under CC BY 4.0, where applicable.
+
+Custom filter icons: Created by the author.
 
 ## 🙋‍♂️ About Me
 
